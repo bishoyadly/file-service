@@ -19,9 +19,9 @@ public class FileController {
 
     @PostMapping
     public ResponseEntity<Object> handleFileUpload(@RequestParam("file") MultipartFile file,
-                                                   @RequestParam("retentionPeriodInSeconds") Integer retentionPeriodInSeconds) {
+                                                   @RequestParam("retentionPeriodInSeconds") Long retentionPeriodInSeconds) {
         try {
-            fileStorageService.saveFile(file);
+            fileStorageService.saveFile(file, retentionPeriodInSeconds);
         } catch (FileStorageException exception) {
             return ResponseEntity.status(exception.getHttpStatus()).body(exception.getMessage());
         }

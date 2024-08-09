@@ -3,18 +3,18 @@ package org.servicenow.leaderelection.service;
 import lombok.extern.slf4j.Slf4j;
 import org.servicenow.leaderelection.configuration.StorageProperties;
 import org.servicenow.leaderelection.exception.FileStorageException;
+import org.servicenow.leaderelection.model.FileStateStoreRecord;
+import org.servicenow.leaderelection.repositories.FileStateStoreRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.time.Instant;
 import java.util.Objects;
 
 @Service
@@ -23,16 +23,24 @@ public class FileStorageService {
 
     private final Path rootLocation;
 
-    public FileStorageService(StorageProperties properties) {
+    private final FileStateStoreRepository fileStateStoreRepository;
+
+    public FileStorageService(StorageProperties properties, FileStateStoreRepository fileStateStoreRepository) {
         this.rootLocation = Paths.get(properties.getLocation());
+        this.fileStateStoreRepository = fileStateStoreRepository;
     }
 
-    public void saveFile(MultipartFile file) {
+    public void saveFile(MultipartFile file, Long retentionPeriodInSeconds) {
         if (file.isEmpty()) {
             throw new FileStorageException(HttpStatus.BAD_REQUEST, "File is empty");
         }
         Path filePath = Paths.get(Objects.requireNonNull(file.getOriginalFilename()));
         String destinationPath = this.rootLocation.resolve(filePath).normalize().toAbsolutePath().toString();
+        writeFileToDisk(file, destinationPath);
+        saveFileStateStoreRecord(file.getOriginalFilename(), destinationPath, retentionPeriodInSeconds);
+    }
+
+    private void writeFileToDisk(MultipartFile file, String destinationPath) {
         try {
             RandomAccessFile stream = new RandomAccessFile(destinationPath, "rw");
             FileChannel channel = stream.getChannel();
@@ -46,7 +54,11 @@ public class FileStorageService {
         }
     }
 
-    private void writeFileToDisk(MultipartFile file) {
-
+    private void saveFileStateStoreRecord(String fileName, String destinationPath, Long retentionPeriodInSeconds) {
+        FileStateStoreRecord fileStateStoreRecord = new FileStateStoreRecord();
+        fileStateStoreRecord.setFileName(fileName);
+        fileStateStoreRecord.setFilePath(destinationPath);
+        fileStateStoreRecord.setFileRetentionPeriodInMS(Instant.now().getEpochSecond() + retentionPeriodInSeconds);
+        fileStateStoreRepository.save(fileStateStoreRecord);
     }
 }

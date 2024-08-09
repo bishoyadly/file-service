@@ -1,9 +1,25 @@
 spring:
   application:
     name: leader-election
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/file-state-store-db}
+    username: ${DB_USER_NAME:bishoy}
+    password: ${DB_PASSWORD:12345}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/schema.xml
 
 server:
   port: ${PORT:8081}
 
 storage:
   location: ${FILE_STORAGE_DIR:uploaded-files-dir}
+
+
+fileSchedulerName: ${FILE_SCHEDULER_NAME:file-scheduler-task}
+fileSchedulerPoolSize: ${FILE_SCHEDULER_POOL_SIZE:10}
+fileSchedulerTaskDelayInMS: ${FILE_SCHEDULER_TASK_DELAY_IN_MS:10000}
