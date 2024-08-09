@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: leader-election
+
+server:
+  port: ${PORT:8081}
+
+storage:
+  location: ${FILE_STORAGE_DIR:uploaded-files-dir}
