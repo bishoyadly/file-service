@@ -1,4 +1,4 @@
-package org.servicenow.leaderelection.model;
+package org.servicenow.fileservice.model;
 
 
 import jakarta.persistence.Column;

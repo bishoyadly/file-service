@@ -1,7 +1,7 @@
-package org.servicenow.leaderelection.controller;
+package org.servicenow.fileservice.controller;
 
-import org.servicenow.leaderelection.exception.FileStorageException;
-import org.servicenow.leaderelection.service.FileStorageService;
+import org.servicenow.fileservice.exception.FileStorageException;
+import org.servicenow.fileservice.service.FileStorageService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;

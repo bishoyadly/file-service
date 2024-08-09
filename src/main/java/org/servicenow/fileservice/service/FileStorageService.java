@@ -1,10 +1,10 @@
-package org.servicenow.leaderelection.service;
+package org.servicenow.fileservice.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.servicenow.leaderelection.configuration.StorageProperties;
-import org.servicenow.leaderelection.exception.FileStorageException;
-import org.servicenow.leaderelection.model.FileStateStoreRecord;
-import org.servicenow.leaderelection.repositories.FileStateStoreRepository;
+import org.servicenow.fileservice.configuration.StorageProperties;
+import org.servicenow.fileservice.exception.FileStorageException;
+import org.servicenow.fileservice.model.FileStateStoreRecord;
+import org.servicenow.fileservice.repositories.FileStateStoreRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

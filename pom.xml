@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>org.servicenow</groupId>
-    <artifactId>leader-election</artifactId>
+    <artifactId>file-service</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>leader-election</name>
+    <name>file-service</name>
     <description>leader-election</description>
     <url/>
     <licenses>
@@ -63,6 +63,22 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+        </dependency>
+        <!-- Apache Curator Dependencies  -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>5.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-framework</artifactId>
+            <version>5.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-client</artifactId>
+            <version>5.7.0</version>
         </dependency>
     </dependencies>
 

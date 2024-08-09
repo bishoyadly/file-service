@@ -1,6 +1,6 @@
-package org.servicenow.leaderelection.repositories;
+package org.servicenow.fileservice.repositories;
 
-import org.servicenow.leaderelection.model.FileStateStoreRecord;
+import org.servicenow.fileservice.model.FileStateStoreRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

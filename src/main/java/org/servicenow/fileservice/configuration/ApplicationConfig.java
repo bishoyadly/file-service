@@ -1,4 +1,4 @@
-package org.servicenow.leaderelection.configuration;
+package org.servicenow.fileservice.configuration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

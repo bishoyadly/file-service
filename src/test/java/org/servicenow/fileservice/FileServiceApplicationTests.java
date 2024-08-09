@@ -1,10 +1,10 @@
-package org.servicenow.leaderelection;
+package org.servicenow.fileservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class LeaderElectionApplicationTests {
+class FileServiceApplicationTests {
 
     @Test
     void contextLoads() {

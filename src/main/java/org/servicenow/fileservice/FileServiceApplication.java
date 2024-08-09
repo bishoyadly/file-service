@@ -1,13 +1,13 @@
-package org.servicenow.leaderelection;
+package org.servicenow.fileservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class LeaderElectionApplication {
+public class FileServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(LeaderElectionApplication.class, args);
+        SpringApplication.run(FileServiceApplication.class, args);
     }
 
 }

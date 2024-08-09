@@ -1,8 +1,8 @@
-package org.servicenow.leaderelection.schedulers;
+package org.servicenow.fileservice.schedulers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.servicenow.leaderelection.model.FileStateStoreRecord;
-import org.servicenow.leaderelection.repositories.FileStateStoreRepository;
+import org.servicenow.fileservice.model.FileStateStoreRecord;
+import org.servicenow.fileservice.repositories.FileStateStoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -35,6 +35,9 @@ public class FileSchedulerService {
     }
 
     public void scheduleFileDeletionTask() {
+        log.info("##############################################################");
+        log.info("Leader Instance Started Scheduled Expired Files Deletion Task");
+        log.info("##############################################################");
         threadPoolTaskScheduler.scheduleWithFixedDelay(this::deleteExpiredFilesTask, Duration.ofMillis(fileSchedulerTaskDelay));
     }
 
@@ -52,9 +55,9 @@ public class FileSchedulerService {
             long currentTimestamp = Instant.now().getEpochSecond();
             if (currentTimestamp > fileStateStoreRecord.getFileRetentionPeriodInMS()) {
                 log.info("file expired and scheduled for deletion thread : {}", Thread.currentThread().getName());
-                fileStateStoreRepository.delete(fileStateStoreRecord);
                 Path filePath = Path.of(fileStateStoreRecord.getFilePath());
                 Files.deleteIfExists(filePath);
+                fileStateStoreRepository.delete(fileStateStoreRecord);
             }
         }
     }

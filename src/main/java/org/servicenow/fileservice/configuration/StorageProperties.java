@@ -1,4 +1,4 @@
-package org.servicenow.leaderelection.configuration;
+package org.servicenow.fileservice.configuration;
 
 
 import lombok.Getter;

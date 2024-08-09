@@ -1,4 +1,4 @@
-package org.servicenow.leaderelection.exception;
+package org.servicenow.fileservice.exception;
 
 import lombok.Getter;
 import lombok.Setter;
