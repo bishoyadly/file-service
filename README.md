@@ -1,85 +1,72 @@
-<!--
-    Licensed to the Apache Software Foundation (ASF) under one
-    or more contributor license agreements.  See the NOTICE file
-    distributed with this work for additional information
-    regarding copyright ownership.  The ASF licenses this file
-    to you under the Apache License, Version 2.0 (the
-    "License"); you may not use this file except in compliance
-    with the License.  You may obtain a copy of the License at
+# File Service
 
-      http://www.apache.org/licenses/LICENSE-2.0
+## Table of Contents
 
-    Unless required by applicable law or agreed to in writing,
-    software distributed under the License is distributed on an
-    "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-    KIND, either express or implied.  See the License for the
-    specific language governing permissions and limitations
-    under the License.
--->
+- [About](#About)
+- [Technologies Used](#technologies-used)
+- [Build And Run Instructions](#build-and-run-instructions)
 
-# Apache Karaf
+## About
 
-[Apache Karaf](https://karaf.apache.org) is a modulith runtime, supporting several frameworks and programming model (REST/API, web, spring boot, ...).
-It provides turnkey features that you can directly leverage without effort, packaged as mutable or immutable application.
+File Service:
 
-## Overview
+- SaveFile endpoint with payload of file (saving on local disk) and it's retention period
+- Delete the expired files regarding to it's saved retention period (automated not from request)
+- Use leader election pattern to execute delete.
+- Add and use Service config for saving path
+- Add and use Service config for delete cycle time (run every 10 minutes for example)
 
-* **Hot deployment**: Karaf supports hot deployment of applications (in the deploy directory).
-* **Dynamic configuration**: Karaf uses a central location (etc directory) for configuration 
-    (in different format, properties, json) and can be plug on existing configuration backend.
-* **Logging System**: using a centralized logging back end supported by Log4J, Karaf
-    supports a number of different APIs (JDK 1.4, JCL, SLF4J, Avalon, Tomcat, ...)
-* **Provisioning**: Provisioning of libraries or applications can be done through a number of
-    different ways, by which they will be downloaded locally, installed and started. It interacts
-    with the resolver to automatically install the required components.
-* **Extensible Shell console**: Karaf features a nice text console where you can manage the
-    services, install new applications or libraries and manage their state. This shell is easily
-    extensible by deploying new commands dynamically along with new features or applications.
-* **Remote access**: use any SSH client to connect to the kernel and issue commands in the console
-* **Security & ACL** framework based on JAAS providing complete RBAC solution.
-* **Managing instances**: Karaf provides simple commands for managing instances of Karaf.
-    You can easily create, delete, start and stop instances of Karaf through the console.
-* **Enterprise features**: Karaf provides a bunch of enterprise features that you can use in your applications (JDBC, JPA, JTA, JMS, ...).
-* **HTTP Service**: Karaf provides a full features web container, allowing you to deploy your web applications.
-* **REST & Services**: Karaf supports different service frameworks as Apache CXF allowing you to easily implements your services.
-* **Karaf Extensions**: Karaf project is a complete ecosystem. The runtime can be extended by other Karaf subprojects such as Karaf Decanter, Karaf Cellar, Karaf Cave, ...
-* **Third Party Extensions**: Karaf is a supported runtime for a lot of other projects as [Apache Camel](https://camel.apache.org), and much more.
+## Technologies Used
 
-## Getting Started
+- Java 17
+- Maven
+- Spring Boot to save time writing boilerplate configurations (DB configurations,ORM vendor configurations, Servlets
+  configs in web.xml file, etc...)
+- Spring MVC to implement multipart endpoint that receive file attachment along with it's retention period
+- Spring Data JPA (which uses Hibernate ORM) to save time instead of writing native SQL
+- PostgreSQL Database to save the file state store that hold file path, retention period
+- Liquibase DB migration tool to initialize schemas
+- Apache Zookeeper that is used for highly reliable distributed coordination that implements ZooKeeper Atomic Broadcast
+  Protocol (ZAB protocol)
+- Apache Curator is a Java/JVM client library for Apache ZooKeeper
+- Apache Zookeeper, Apache Curator used for leader election
 
-For an Apache Karaf source distribution, please read [BUILDING.md](https://github.com/apache/karaf/blob/main/BUILDING.md) for instructions on building Apache Karaf.
+## Build And Run Instructions
 
-For an Apache Karaf binary distribution, please read [RELEASE-NOTES.md](https://github.com/apache/karaf/blob/main/RELEASE-NOTES.md) for installation instructions and list of supported
-and unsupported features.
+**Install Required Tools:**
 
-The PDF manual is the right place to find any information about Karaf.
+1. Install Java OpenJDK 17 using [Software Development Kit Manager](https://sdkman.io/) or from preferred source
 
-The [examples](https://github.com/apache/karaf/tree/main/examples) provide a bunch of turnkey minimal applications that you can deploy in Apache Karaf and extend/template as you want.
+```
+curl -s "https://get.sdkman.io" | bash
+sdk install java 11.0.2-open
+```
 
-[NOTE]
-====
-Windows users should use 7zip or other unzip tool to support files longer than 255 characters.
-====
+2. Install maven using APT or manually from [Apache Maven Website](https://maven.apache.org/install.html) or just run using maven wrapper shell script installed within project.
 
-## Contact Us
+```
+sudo apt update
+sudo apt install maven
+```
 
-To get involved in Apache Karaf:
+3. Install PostgreSQL Database
 
-* [Subscribe](mailto:user-subscribe@karaf.apache.org) or [mail](mailto:user@karaf.apache.org) the [user@karaf.apache.org](https://mail-archives.apache.org/mod_mbox/karaf-user/) list.
-* [Subscribe](mailto:dev-subscribe@karaf.apache.org) or [mail](mailto:dev@karaf.apache.org) the [dev@karaf.apache.org](https://mail-archives.apache.org/mod_mbox/karaf-dev/) list.
-* Report issues on [JIRA](https://issues.apache.org/jira/browse/KARAF).
+```
+https://www.postgresql.org/download/
+```
 
-We also have a [contributor's guide](https://karaf.apache.org/community.html#contribute).
+4. Install and run Apache Zookeeper
 
-## More Information
+```
+https://www.apache.org/dyn/closer.lua/zookeeper/zookeeper-3.8.4/apache-zookeeper-3.8.4-bin.tar.gz
+https://zookeeper.apache.org/doc/current/zookeeperStarted.html
 
-* [Apache Karaf](https://karaf.apache.org)
-* [Apache Karaf News](https://karaf.apache.org/news.html)
-* [Apache Karaf Download](https://karaf.apache.org/download.html)
-* [Apache Karaf Documentation](https://karaf.apache.org/documentation.html)
-* [Apache Karaf Community](https://karaf.apache.org/community.html)
-* [Apache Software Foundation](https://www.apache.org)
+./zkServer.sh start
+```
 
-Many thanks for using Apache Karaf.
-
-**The Apache Karaf Team**
+5. Run multiple instances of the spring boot application using server shell scripts
+```
+./server1.sh
+./server2.sh
+./server3.sh
+```

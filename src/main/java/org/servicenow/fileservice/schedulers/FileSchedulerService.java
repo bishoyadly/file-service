@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.concurrent.ScheduledFuture;
 
 @Service
 @Slf4j
@@ -24,6 +25,8 @@ public class FileSchedulerService {
 
     private final FileStateStoreRepository fileStateStoreRepository;
 
+    private ScheduledFuture<?> scheduledFuture;
+
     @Autowired
     public FileSchedulerService(ThreadPoolTaskScheduler threadPoolTaskScheduler,
                                 @Value("${fileSchedulerTaskDelayInMS:10000}") int fileSchedulerTaskDelay,
@@ -31,15 +34,21 @@ public class FileSchedulerService {
         this.threadPoolTaskScheduler = threadPoolTaskScheduler;
         this.fileSchedulerTaskDelay = fileSchedulerTaskDelay;
         this.fileStateStoreRepository = fileStateStoreRepository;
-        scheduleFileDeletionTask();
     }
 
     public void scheduleFileDeletionTask() {
         log.info("##############################################################");
-        log.info("Leader Instance Started Scheduled Expired Files Deletion Task");
+        log.info("Expired Files Deletion Task Scheduled");
         log.info("##############################################################");
-        threadPoolTaskScheduler.scheduleWithFixedDelay(this::deleteExpiredFilesTask, Duration.ofMillis(fileSchedulerTaskDelay));
+        scheduledFuture = threadPoolTaskScheduler
+                .scheduleWithFixedDelay(this::deleteExpiredFilesTask, Duration.ofMillis(fileSchedulerTaskDelay));
     }
+
+    public void cancelScheduledFileDeletionTask() {
+        log.info("Leadership revoked from zookeeper");
+        scheduledFuture.cancel(true);
+    }
+
 
     public void deleteExpiredFilesTask() {
         try {
@@ -54,7 +63,7 @@ public class FileSchedulerService {
         for (FileStateStoreRecord fileStateStoreRecord : fileStateStoreRecordList) {
             long currentTimestamp = Instant.now().getEpochSecond();
             if (currentTimestamp > fileStateStoreRecord.getFileRetentionPeriodInMS()) {
-                log.info("file expired and scheduled for deletion thread : {}", Thread.currentThread().getName());
+                log.info("File {} Expired And Scheduled For Deletion", fileStateStoreRecord.getFileName());
                 Path filePath = Path.of(fileStateStoreRecord.getFilePath());
                 Files.deleteIfExists(filePath);
                 fileStateStoreRepository.delete(fileStateStoreRecord);
